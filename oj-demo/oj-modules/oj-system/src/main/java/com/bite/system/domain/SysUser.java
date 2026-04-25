@@ -11,7 +11,7 @@ import lombok.Data;
 public class SysUser extends BaseEntity {
 
     @TableId(type = IdType.ASSIGN_ID)
-    private long userId;
+    private Long userId;
 
     private String userAccount;
 

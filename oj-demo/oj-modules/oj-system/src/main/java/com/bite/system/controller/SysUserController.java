@@ -1,10 +1,10 @@
 package com.bite.system.controller;
 
+import com.bite.common.core.controller.BaseController;
 import com.bite.common.core.domain.R;
-import com.bite.system.domain.LoginDTO;
-import com.bite.system.domain.SysUser;
-import com.bite.system.domain.SysUserSaveDTO;
-import com.bite.system.domain.SysUserVO;
+import com.bite.system.domain.dto.LoginDTO;
+import com.bite.system.domain.dto.SysUserSaveDTO;
+import com.bite.system.domain.vo.SysUserVO;
 import com.bite.system.service.ISysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/sysUser")
 @Tag(name = "管理员api")
-public class SysUserController {
+public class SysUserController extends BaseController {
 
     @Autowired
     private ISysUserService sysUserService;
@@ -29,7 +29,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "2000",description = "服务器繁忙请稍后重试")
     @ApiResponse(responseCode = "3102",description = "用户不存在")
     @ApiResponse(responseCode = "3103",description = "用户名或密码错误")
-    public R<Void> login(@RequestBody LoginDTO loginDTO){
+    public R<String> login(@RequestBody LoginDTO loginDTO){
         return sysUserService.login(loginDTO.getUserAccount(),loginDTO.getPassword());
     }
 
@@ -43,7 +43,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "2000",description = "服务器繁忙请稍后重试")
     @ApiResponse(responseCode = "3101",description = "用户已存在")
     public R<Void> add(@RequestBody SysUserSaveDTO sysUserSaveDTO){
-        return null;
+        return toR(sysUserService.add(sysUserSaveDTO));
     }
 
 

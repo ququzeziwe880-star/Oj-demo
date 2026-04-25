@@ -24,6 +24,10 @@ public class R<T> {
         return assenmbleResult(null,ResultCode.FAILED);
     }
 
+    public static <T> R<T> fail(int code, String msg){
+        return assenmbleResult(code,msg,null);
+    }
+
     public static <T> R<T> fail(ResultCode resultCode){
         return assenmbleResult(null,resultCode);
     }
@@ -33,6 +37,14 @@ public class R<T> {
         r.setCode(resultCode.getCode());
         r.setData(data);
         r.setMsg(resultCode.getMsg());
+        return r;
+    }
+
+    private static <T> R<T> assenmbleResult(int code, String msg,T data){
+        R<T> r = new R<>();
+        r.setCode(code);
+        r.setData(data);
+        r.setMsg(msg);
         return r;
     }
 }

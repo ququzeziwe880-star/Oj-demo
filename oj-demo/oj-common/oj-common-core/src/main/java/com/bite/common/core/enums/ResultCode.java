@@ -8,11 +8,11 @@ import lombok.Getter;
 @Getter
 public enum ResultCode {
 
-    //操作唱功​
+    //操作唱功
     SUCCESS (1000, "操作成功"),
-    //服务器内部错误，友好提示​
+    //服务器内部错误，友好提示
     ERROR (2000, "服务繁忙请稍后重试"),
-    //操作失败，但是服务器不存在异常​
+    //操作失败，但是服务器不存在异常
     FAILED (3000, "操作失败"),
     FAILED_UNAUTHORIZED (3001, "未授权"),
     FAILED_PARAMS_VALIDATE (3002, "参数校验失败"),
