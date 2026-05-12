@@ -29,6 +29,5 @@
             <version>${oj-common-swagger.version}</version>
         </dependency>
 
-
     </dependencies>
 </project>
