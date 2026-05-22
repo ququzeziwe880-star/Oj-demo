@@ -18,10 +18,22 @@ public enum ResultCode {
     FAILED_PARAMS_VALIDATE (3002, "参数校验失败"),
     FAILED_NOT_EXISTS (3003, "资源不存在"),
     FAILED_ALREADY_EXISTS (3004, "资源已存在"),
+
+
+
     AILED_USER_EXISTS (3101, "用户已存在"),
     FAILED_USER_NOT_EXISTS (3102, "用户不存在"),
     FAILED_LOGIN (3103, "用户名或密码错误"),
     FAILED_USER_BANNED (3104, "您已被列入黑名单, 请联系管理员."),
+    FAILED_USER_PHONE(3105,"输入的手机号有误"),
+    FAILED_FREQUENT(3106,"操作频繁，请稍后重试"),
+    FAILED_TIME_LIMIT(3107,"当天请求次数已达到上限"),
+    FAILED_SEND_CODE(3108,"验证码发送错误"),
+    FAILED_INVALID_CODE(3109,"验证码失效"),
+    FAILED_ERROR_CODE(3110,"验证码错误"),
+
+
+
     EXAM_START_TIME_BEFORE_CURRENT_TIME(3201,"竞赛开始时间不能早于当前时间"),
     EXAM_START_TIME_AFTER_END_TIME(3202,"竞赛开始时间不能晚于结束时间"),
     EXAM_NOT_EXISTS(3203,"竞赛不存在"),
@@ -29,6 +41,10 @@ public enum ResultCode {
     EXAM_STARTED(3205,"竞赛已经开始无法进行编辑操作"),
     EXAM_UNEND(3206,"竞赛还未结束无法进行编辑操作"),
     EXAM_NOT_HAS_QUESTION(3207,"竞赛当中不包含题目");
+
+
+
+
 
     private int code;
     private String msg;

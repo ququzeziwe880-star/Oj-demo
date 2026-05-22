@@ -112,6 +112,14 @@ public class RedisService {
         return JSON.parseObject(String.valueOf(t), clazz);
     }
 
+    /**
+     * 计数加一
+     * @param key
+     * @return
+     */
+    public Long increament(final String key){
+      return redisTemplate.opsForValue().increment(key);
+    }
 
 //*************** 操作list结构 ****************
     /**
