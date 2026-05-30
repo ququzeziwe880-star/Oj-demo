@@ -56,7 +56,7 @@ public class ISysUserServiceImpl implements ISysUserService {
             loginResult.setMsg(ResultCode.SUCCESS.getMsg());
             return loginResult;*/
             return R.ok(tokenService.createToken(sysUser.getUserId(),
-                    secret,UserIdentity.ADMIN.getValue(),sysUser.getNickName()));
+                    secret,UserIdentity.ADMIN.getValue(),sysUser.getNickName(),null));
         }
 
        /* loginResult.setCode(ResultCode.FAILED_LOGIN.getCode());
@@ -71,7 +71,7 @@ public class ISysUserServiceImpl implements ISysUserService {
         if (StrUtil.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
             token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
         }
-        return tokenService.deleteLoginUser(token,secret);
+        return tokenService.deleteLoginUser();
     }
 
 
@@ -94,7 +94,7 @@ public class ISysUserServiceImpl implements ISysUserService {
         if (StrUtil.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
             token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
         }
-        LoginUser loginUser = tokenService.getLoginUser(token,secret);
+        LoginUser loginUser = tokenService.getLoginUser();
 
         if (loginUser == null) return R.fail();
 

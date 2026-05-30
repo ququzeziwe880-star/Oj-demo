@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.bite.common.core.constans.Constans;
+import com.bite.common.core.constans.Constants;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.security.exception.ServiceException;
 import com.bite.system.domain.exam.Exam;
@@ -17,6 +17,7 @@ import com.bite.system.domain.exam.vo.ExamDetailVO;
 import com.bite.system.domain.exam.vo.ExamVO;
 import com.bite.system.domain.question.Question;
 import com.bite.system.domain.question.vo.QuestionVO;
+import com.bite.system.manager.ExamCacheManager;
 import com.bite.system.mapper.exam.ExamMapper;
 import com.bite.system.mapper.exam.ExamQuestionMapper;
 import com.bite.system.mapper.question.QuestionMapper;
@@ -41,6 +42,9 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper,ExamQuestion
 
     @Autowired
     private ExamQuestionMapper examQuestionMapper;
+
+    @Autowired
+    private ExamCacheManager examCacheManager;
     @Override
     public List<ExamVO> list(ExamQueryDTO examQueryDTO) {
         PageHelper.startPage(examQueryDTO.getPageNum(),examQueryDTO.getPageSize());
@@ -127,12 +131,18 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper,ExamQuestion
     @Override
     public int publish(Long examId) {
         Exam exam = getExam(examId);
+        if (exam.getEndTime().isBefore(LocalDateTime.now())){
+            throw new ServiceException(ResultCode.EXAM_IS_FINISH);
+        }
         Long count = examQuestionMapper.selectCount(new LambdaQueryWrapper<ExamQuestion>()
                 .eq(ExamQuestion::getExamId, examId));
         if (count == null || count <= 0){
             throw new ServiceException(ResultCode.EXAM_NOT_HAS_QUESTION);
         }
-        exam.setStatus(Constans.TRUE);
+        exam.setStatus(Constants.TRUE);
+
+        // 将要发布的竞赛数据存储到 redis
+        examCacheManager.addCache(exam);
         return examMapper.updateById(exam);
     }
 
@@ -140,7 +150,11 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper,ExamQuestion
     public int cancelPublish(Long examId) {
         Exam exam = getExam(examId);
         checkStartExam(exam);
-        exam.setStatus(Constans.FALSE);
+        if (exam.getEndTime().isBefore(LocalDateTime.now())){
+            throw new ServiceException(ResultCode.EXAM_IS_FINISH);
+        }
+        exam.setStatus(Constants.FALSE);
+        examCacheManager.deleteCache(examId);
         return examMapper.updateById(exam);
     }
 

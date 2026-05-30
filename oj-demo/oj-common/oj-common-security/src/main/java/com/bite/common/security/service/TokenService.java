@@ -1,8 +1,10 @@
 package com.bite.common.security.service;
 
 import cn.hutool.core.lang.UUID;
-import com.bite.common.core.constans.CacheConstans;
+import com.bite.common.core.constans.CacheConstants;
+import com.bite.common.core.constans.Constants;
 import com.bite.common.core.constans.JwtConstans;
+import com.bite.common.core.utils.ThreadLocalUtil;
 import com.bite.common.redis.service.RedisService;
 import com.bite.common.core.domain.LoginUser;
 import com.bite.common.core.utils.JwtUtils;
@@ -22,7 +24,7 @@ public class TokenService {
     @Autowired
     private RedisService redisService;
 
-    public String createToken(Long userId,String secret,Integer identity,String nickName){
+    public String createToken(Long userId,String secret,Integer identity,String nickName,String headImage){
         Map<String, Object> claims = new HashMap<>();
         String userKey = UUID.fastUUID().toString();
         claims.put(JwtConstans.LOGIN_USER_ID, userId);
@@ -34,13 +36,14 @@ public class TokenService {
         LoginUser loginUser = new LoginUser();
         loginUser.setIdentity(identity);
         loginUser.setNickName(nickName);
-        redisService.setCacheObject(tokenKey,loginUser,CacheConstans.EXP, TimeUnit.MINUTES);
+        loginUser.setHeadImage(headImage);
+        redisService.setCacheObject(tokenKey,loginUser, CacheConstants.EXP, TimeUnit.MINUTES);
         return token;
     }
 
     //实际上延长token的有效时间就是延长redis中存储的用于用户认证的敏感信息的有效时间      操作redis   token ---> 唯一标识
     //在身份认证通过之后才会调用，并且在请求到达 controller 之后
-    public void extendToken(String token,String secret){
+    public void extendToken(Claims claims){
         /*Claims claims;
         try {
             claims = JwtUtils.parseToken(token, secret); //获取令牌中信息 解析payload中信息
@@ -53,44 +56,54 @@ public class TokenService {
             return;
         }
 */
-        String userKey = getUserKey(token,secret); //获取jwt中的key
+        String userKey = getUserKey(claims); //获取jwt中的key
         if (userKey == null) return;
         String tokenKey = getTokenKey(userKey);
 
         // 720min 12h  剩余 180min 的时候再续杯
         Long expire = redisService.getExpire(tokenKey, TimeUnit.MINUTES);
-        if (expire != null && expire < CacheConstans.REFRESH_TIME){
-            redisService.expire(tokenKey,CacheConstans.EXP,TimeUnit.MINUTES);
+        if (expire != null && expire < CacheConstants.REFRESH_TIME){
+            redisService.expire(tokenKey, CacheConstants.EXP,TimeUnit.MINUTES);
         }
     }
 
     private String getTokenKey(String userKey){
-        return CacheConstans.Login_Token_Key + userKey;
+        return CacheConstants.Login_Token_Key + userKey;
     }
 
-    private String getUserKey(String token,String secret){
+
+    public String getUserKey(Claims claims){
+        if (claims == null) return null;
+        return JwtUtils.getUserKey(claims); //获取jwt中的key
+    }
+
+    public Long getUserId(Claims claims){
+        if (claims == null) return null;
+        return Long.valueOf(JwtUtils.getUserId(claims)); //获取jwt中的key
+    }
+
+    public Claims getClaims(String token, String secret) {
         Claims claims;
         try {
             claims = JwtUtils.parseToken(token, secret); //获取令牌中信息 解析payload中信息
             if (claims == null) {
-                log.error("解析token:{},出现异常" ,token);
+                log.error("解析token:{},出现异常" , token);
                 return null;
             }
         } catch (Exception e) {
-            log.error("解析token:{},出现异常" ,token, e);
+            log.error("解析token:{},出现异常" , token, e);
             return null;
         }
-
-        return JwtUtils.getUserKey(claims); //获取jwt中的key
+        return claims;
     }
-    public LoginUser getLoginUser(String token,String secret) {
-        String userKey = getUserKey(token,secret);
+    public LoginUser getLoginUser() {
+        String userKey = ThreadLocalUtil.get(Constants.USER_KEY,String.class);
         if (userKey == null) return null;
         return redisService.getCacheObject(getTokenKey(userKey),LoginUser.class);
     }
 
-    public boolean deleteLoginUser(String token,String secret){
-        String userKey = getUserKey(token,secret);
+    public boolean deleteLoginUser(){
+        String userKey = ThreadLocalUtil.get(Constants.USER_KEY,String.class);;
         if (userKey == null) return false;
         return redisService.deleteObject(getTokenKey(userKey));
     }

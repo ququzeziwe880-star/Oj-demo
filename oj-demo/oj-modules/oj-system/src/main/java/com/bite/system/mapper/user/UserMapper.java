@@ -5,9 +5,9 @@ import com.bite.system.domain.exam.Exam;
 import com.bite.system.domain.user.User;
 import com.bite.system.domain.user.dto.UserQueryDTO;
 import com.bite.system.domain.user.vo.UserVO;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-
 public interface UserMapper extends BaseMapper<User> {
    List<UserVO> selectUserList(UserQueryDTO userQueryDTO);
 }

@@ -1,12 +1,14 @@
 package com.bite.gateway.filter;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
-import com.bite.common.core.constans.CacheConstans;
+import com.bite.common.core.constans.CacheConstants;
+import com.bite.common.core.constans.Constants;
 import com.bite.common.core.constans.HttpConstants;
 import com.bite.common.core.domain.LoginUser;
 import com.bite.common.core.domain.R;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.core.enums.UserIdentity;
+import com.bite.common.core.utils.ThreadLocalUtil;
 import com.bite.common.redis.service.RedisService;
 import com.bite.common.core.utils.JwtUtils;
 import com.bite.gateway.properties.IgnoreWhiteProperties;
@@ -87,7 +89,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
             return unauthorizedResponse(exchange, "令牌验证失败");
         }
 
-
         return chain.filter(exchange);
     }
 
@@ -130,7 +131,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
      * 获取缓存key
      */
     private String getTokenKey(String token) {
-        return CacheConstans.Login_Token_Key + token;
+        return CacheConstants.Login_Token_Key + token;
     }
 
     /**

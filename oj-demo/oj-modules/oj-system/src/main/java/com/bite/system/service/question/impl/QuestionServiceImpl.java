@@ -3,7 +3,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.bite.common.core.constans.Constans;
+import com.bite.common.core.constans.Constants;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.security.exception.ServiceException;
 import com.bite.system.domain.question.Question;
@@ -33,7 +33,7 @@ public class QuestionServiceImpl implements IQuestionService {
     public List<QuestionVO> list(QuestionQueryDTO questionQueryDTO) {
         String excludeIdStr = questionQueryDTO.getExcludeIdStr();
         if (StrUtil.isNotEmpty(excludeIdStr)){
-            String[] excludeIdArr = excludeIdStr.split(Constans.SPLIT_SEM);
+            String[] excludeIdArr = excludeIdStr.split(Constants.SPLIT_SEM);
             Set<Long> excludeIdSet = Arrays.stream(excludeIdArr)
                     .map(Long::valueOf)
                     .collect(Collectors.toSet());

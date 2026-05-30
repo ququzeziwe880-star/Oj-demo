@@ -8,4 +8,6 @@ public class LoginUser {
     private Integer identity; // 1 表示普通用户 2 表示 管理员用户
 
     private String nickName;
+
+    private String headImage;
 }

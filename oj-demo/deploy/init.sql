@@ -85,3 +85,18 @@ create table tb_user(
     update_time  datetime comment '更新时间',
     primary key(`user_id`)
 )
+
+
+竞赛报名
+create table tb_user_exam(
+    user_exam_id bigint unsigned not null comment '用户竞赛关系id(主键)',
+    user_id bigint unsigned not null comment '用户id(主键)',
+    exam_id bigint unsigned not null comment '竞赛id(主键)',
+    score int unsigned comment '得分',
+    exam_rank int unsigned comment '排名',
+    create_by    bigint unsigned not null  comment '创建人',
+    create_time  datetime not null comment '创建时间',
+    update_by    bigint unsigned  comment '更新人',
+    update_time  datetime comment '更新时间',
+    primary key(`user_exam_id`)
+)

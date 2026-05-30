@@ -28,6 +28,6 @@ public class BCryptUtils {
     }
 
     public static void main(String[] args) {
-        System.out.println(encryptPassword("123456"));
+        System.out.println(encryptPassword("00000000"));
     }
 }
