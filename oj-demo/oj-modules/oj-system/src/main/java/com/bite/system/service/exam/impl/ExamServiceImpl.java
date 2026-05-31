@@ -111,6 +111,9 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper,ExamQuestion
     @Override
     public int edit(ExamEditDTO examEditDTO) {
         Exam exam = getExam(examEditDTO.getExamId());
+        if (Constants.TRUE.equals(exam.getStatus())){
+            throw new ServiceException(ResultCode.EXAM_IS_PUBLISH);
+        }
         checkStartExam(exam);
         checkExamSaveParms(examEditDTO,null);
         exam.setTitle(examEditDTO.getTitle());
@@ -122,6 +125,9 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper,ExamQuestion
     @Override
     public int delete(Long examId) {
         Exam exam = getExam(examId);
+        if (Constants.TRUE.equals(exam.getStatus())){
+            throw new ServiceException(ResultCode.EXAM_IS_PUBLISH);
+        }
         checkFinishExam(exam);
         examQuestionMapper.delete(new LambdaQueryWrapper<ExamQuestion>()
                 .eq(ExamQuestion::getExamId,examId));

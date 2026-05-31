@@ -10,8 +10,10 @@ import com.bite.system.domain.question.Question;
 import com.bite.system.domain.question.dto.QuestionAddDTO;
 import com.bite.system.domain.question.dto.QuestionEditDTO;
 import com.bite.system.domain.question.dto.QuestionQueryDTO;
+import com.bite.system.domain.question.es.QuestionES;
 import com.bite.system.domain.question.vo.QuestionDetailVO;
 import com.bite.system.domain.question.vo.QuestionVO;
+import com.bite.system.elasticsearch.QuestionRepository;
 import com.bite.system.mapper.question.QuestionMapper;
 import com.bite.system.service.question.IQuestionService;
 import com.github.pagehelper.PageHelper;
@@ -29,6 +31,9 @@ public class QuestionServiceImpl implements IQuestionService {
     @Autowired
     private QuestionMapper questionMapper;
 
+    @Autowired
+    private QuestionRepository questionRepository;
+
     @Override
     public List<QuestionVO> list(QuestionQueryDTO questionQueryDTO) {
         String excludeIdStr = questionQueryDTO.getExcludeIdStr();
@@ -44,7 +49,7 @@ public class QuestionServiceImpl implements IQuestionService {
     }
 
     @Override
-    public int add(QuestionAddDTO questionAddDTO) {
+    public boolean add(QuestionAddDTO questionAddDTO) {
         List<Question> questions = questionMapper.selectList(new LambdaQueryWrapper<Question>().eq(Question::getTitle, questionAddDTO.getTitle()));
         if (CollectionUtil.isNotEmpty(questions)){
             throw new ServiceException(ResultCode.FAILED_ALREADY_EXISTS);
@@ -52,7 +57,14 @@ public class QuestionServiceImpl implements IQuestionService {
 
         Question question = new Question();
         BeanUtil.copyProperties(questionAddDTO,question);
-        return questionMapper.insert(question);
+        int insert = questionMapper.insert(question);
+        if (insert <= 0){
+            return false;
+        }
+        QuestionES questionES = new QuestionES();
+        BeanUtil.copyProperties(question,questionES);
+        questionRepository.save(questionES);
+        return true;
     }
 
     @Override
@@ -82,6 +94,10 @@ public class QuestionServiceImpl implements IQuestionService {
         question.setQuestionCase(questionEditDTO.getQuestionCase());
         question.setDefaultCode(questionEditDTO.getDefaultCode());
         question.setMainFuc(questionEditDTO.getMainFuc());
+
+        QuestionES questionES = new QuestionES();
+        BeanUtil.copyProperties(question,questionES);
+        questionRepository.save(questionES);
         return questionMapper.updateById(question);
     }
 
@@ -91,6 +107,7 @@ public class QuestionServiceImpl implements IQuestionService {
         if (question == null){
             throw new ServiceException(ResultCode.FAILED_NOT_EXISTS);
         }
+        questionRepository.deleteById(questionId);
         return questionMapper.deleteById(questionId);
     }
 }

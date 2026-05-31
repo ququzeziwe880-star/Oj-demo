@@ -42,6 +42,7 @@ public enum ResultCode {
     EXAM_UNEND(3206,"竞赛还未结束无法进行编辑操作"),
     EXAM_NOT_HAS_QUESTION(3207,"竞赛当中不包含题目"),
     EXAM_IS_FINISH(3208,"竞赛已经结束不能进行操作"),
+    EXAM_IS_PUBLISH(3208,"竞赛已经发布，不能进行编辑或删除操作"),
 
 
 
