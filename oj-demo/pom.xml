@@ -21,6 +21,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <module>oj-common/oj-common-mybatis</module>
         <module>oj-common/oj-common-message</module>
         <module>oj-common/oj-common-essticsearch</module>
+        <module>oj-common/oj-common-file</module>
     </modules>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -44,6 +45,11 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <fastjson.version>2.0.43</fastjson.version>
         <xxl-job.version>3.4.0</xxl-job.version>
         <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
+        <org.glassfish.jaxb.version>2.3.3</org.glassfish.jaxb.version>
+        <javax.activation.version>1.1.1</javax.activation.version>
+        <javax.xml.bind.version>2.3.1</javax.xml.bind.version>
+        <aliyun.oss.version>3.18.4</aliyun.oss.version>
+        <oj-common-file.version>1.0-SNAPSHOT</oj-common-file.version>
     </properties>
     <dependencies>
         <!-- bootstrap 启动器 -->

@@ -46,7 +46,9 @@ public enum ResultCode {
 
 
 
-    USER_EXAM_HAS_ENTER(3301,"用户已经报名过该竞赛了");
+    USER_EXAM_HAS_ENTER(3301,"用户已经报名过该竞赛了"),
+    FAILED_FILE_UPLOAD                  (3401, "文件上传失败"),
+    FAILED_FILE_UPLOAD_TIME_LIMIT       (3402, "当天上传图片数量超过上限");
 
     private int code;
     private String msg;

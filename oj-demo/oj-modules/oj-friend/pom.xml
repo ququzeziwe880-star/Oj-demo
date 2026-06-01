@@ -28,5 +28,11 @@
             <artifactId>oj-common-essticsearch</artifactId>
             <version>${oj-common-essticsearch.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>oj-common-file</artifactId>
+            <version>${oj-common-file.version}</version>
+        </dependency>
     </dependencies>
 </project>

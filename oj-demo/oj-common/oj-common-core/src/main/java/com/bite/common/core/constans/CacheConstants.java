@@ -15,4 +15,9 @@ public class CacheConstants {
 
     public final static String USER_EXAM_LIST = "u:e:l:";    //用户竞赛列表
 
+    public static final String USER_DETAIL = "u:d:";
+
+    public static final long USER_EXP = 10;
+
+    public static final String USER_UPLOAD_TIMES_KEY = "u:u:t";
 }

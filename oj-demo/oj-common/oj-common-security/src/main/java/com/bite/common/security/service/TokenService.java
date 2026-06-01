@@ -67,6 +67,13 @@ public class TokenService {
         }
     }
 
+    public void refreshLoginUser(String nickName,String headImage,String userKey){
+        String tokenKey = getTokenKey(userKey);
+        LoginUser loginUser = getLoginUser();
+        loginUser.setNickName(nickName);
+        loginUser.setHeadImage(headImage);
+        redisService.setCacheObject(tokenKey,loginUser);
+    }
     private String getTokenKey(String userKey){
         return CacheConstants.Login_Token_Key + userKey;
     }

@@ -1,5 +1,6 @@
 package com.bite.friend.service.user.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,14 +13,19 @@ import com.bite.common.core.domain.vo.LoginUserVO;
 import com.bite.common.core.enums.ResultCode;
 import com.bite.common.core.enums.UserIdentity;
 import com.bite.common.core.enums.UserStatus;
+import com.bite.common.core.utils.ThreadLocalUtil;
 import com.bite.common.message.service.AliSmsService;
 import com.bite.common.redis.service.RedisService;
 import com.bite.common.security.exception.ServiceException;
 import com.bite.common.security.service.TokenService;
 import com.bite.friend.domain.user.User;
 import com.bite.friend.domain.user.dto.UserDTO;
+import com.bite.friend.domain.user.dto.UserUpdateDTO;
+import com.bite.friend.domain.user.vo.UserVO;
+import com.bite.friend.manager.UserCacheManager;
 import com.bite.friend.mapper.user.UserMapper;
 import com.bite.friend.service.user.IUserService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,6 +49,9 @@ public class UserServiceImpl implements IUserService {
     private UserMapper userMapper;
 
     @Autowired
+    private UserCacheManager userCacheManager;
+
+    @Autowired
     private TokenService tokenService;
 
     @Value("${jwt.secret}")
@@ -55,7 +64,8 @@ public class UserServiceImpl implements IUserService {
     @Value("${sms.send-limit:3}")
     private Integer sendLimit;
 
-
+    @Value("${file.oss.downLoadUrl}")
+    private String downLoadUrl;
     @Override
     public boolean sendCode(UserDTO userDTO) {
         if (!checkPhone(userDTO.getPhone())){
@@ -123,8 +133,70 @@ public class UserServiceImpl implements IUserService {
 
         LoginUserVO loginUserVO = new LoginUserVO();
         loginUserVO.setNickName(loginUser.getNickName());
-        loginUserVO.setHeadImage(loginUser.getHeadImage());
+        if (StrUtil.isNotEmpty(loginUser.getHeadImage())){
+            loginUserVO.setHeadImage( downLoadUrl + loginUser.getHeadImage());
+        }
         return R.ok(loginUserVO);
+    }
+
+    @Override
+    public UserVO detail() {
+        Long userId = ThreadLocalUtil.get(Constants.USER_ID,Long.class);
+        if (userId == null){
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        UserVO userVO = userCacheManager.getUserById(userId);
+        if (userVO == null){
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        if (StrUtil.isNotEmpty(userVO.getHeadImage())){
+            userVO.setHeadImage( downLoadUrl + userVO.getHeadImage());
+        }
+        return userVO;
+    }
+
+    @Override
+    public int edit(UserUpdateDTO userUpdateDTO) {
+
+        User user = getUser();
+        user.setNickName(userUpdateDTO.getNickName());
+        user.setSex(userUpdateDTO.getSex());
+        user.setSchoolName(userUpdateDTO.getSchoolName());
+        user.setMajorName(userUpdateDTO.getMajorName());
+        user.setPhone(userUpdateDTO.getPhone());
+        user.setEmail(userUpdateDTO.getEmail());
+        user.setWechat(userUpdateDTO.getWechat());
+        user.setIntroduce(userUpdateDTO.getIntroduce());
+
+        userCacheManager.refreshUser(user);
+        tokenService.refreshLoginUser(user.getNickName(),user.getHeadImage(),ThreadLocalUtil.get(Constants.USER_KEY,String.class));
+        return userMapper.updateById(user);
+    }
+
+
+    @NotNull
+    private User getUser() {
+        Long userId = ThreadLocalUtil.get(Constants.USER_ID,Long.class);
+        if (userId == null){
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        return user;
+    }
+
+    @Override
+    public int updateHeadImage(String headImage) {
+
+        User user = getUser();
+        user.setHeadImage(headImage);
+
+        userCacheManager.refreshUser(user);
+        tokenService.refreshLoginUser(user.getNickName(),user.getHeadImage(),ThreadLocalUtil.get(Constants.USER_KEY,String.class));
+        return userMapper.updateById(user);
     }
 
 
