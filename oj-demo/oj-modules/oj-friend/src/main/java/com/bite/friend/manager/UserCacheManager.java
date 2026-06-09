@@ -38,6 +38,7 @@ public class UserCacheManager {
                         User::getWechat,
                         User::getIntroduce,
                         User::getSchoolName,
+                        User::getStatus,
                         User::getMajorName,
                         User::getStatus)
                 .eq(User::getUserId, userId));

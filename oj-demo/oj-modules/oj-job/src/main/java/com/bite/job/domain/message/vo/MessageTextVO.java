@@ -1,0 +1,12 @@
+package com.bite.job.domain.message.vo;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class MessageTextVO {
+    private String messageTitle;
+
+    private String messageContent;
+}

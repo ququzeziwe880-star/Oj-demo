@@ -100,3 +100,83 @@ create table tb_user_exam(
     update_time  datetime comment '更新时间',
     primary key(`user_exam_id`)
 )
+
+
+用户提交表
+create table tb_user_submit(
+    submit_id bigint unsigned not null comment '提交记录id(主键)',
+    user_id  bigint unsigned not null comment '用户id(主键)',
+    exam_id  bigint unsigned comment '竞赛id(主键)',
+    question_id  bigint unsigned not null comment '题目id(主键)',
+    program_type tinyint not null comment '代码类型 0: java 1: c++',
+    user_code text not null comment '用户代码',
+    `pass` tinyint not null comment '0: 未通过,1: 通过',
+    exe_message varchar(500) not null comment '执行结果',
+    score int not null default '0' comment '得分',
+    create_by    bigint unsigned not null  comment '创建人',
+    create_time  datetime not null comment '创建时间',
+    update_by    bigint unsigned  comment '更新人',
+    update_time  datetime comment '更新时间',
+
+    primary key(`submit_id`)
+
+)
+
+
+我的消息功能
+
+站内信: 网站内部的一种通信方式
+    1.用户和用户之间通信
+    2.管理原/系统 和 某个用户之间的通信  ----> 竞赛结果的通信消息
+    3.管理员/系统 和 某个用户群之间的通信
+
+主键id 消息标题 消息内容 接收人 发送人
+
+----------------------------------------
+
+消息内容表
+create table tb_message_text(
+    text_id bigint unsigned not null comment '消息内容id(主键)',
+    message_title varchar(10) not null comment '消息标题',
+    message_content varchar(200) not null comment '消息内容',
+    create_by    bigint unsigned not null  comment '创建人',
+    create_time  datetime not null comment '创建时间',
+    update_by    bigint unsigned  comment '更新人',
+    update_time  datetime comment '更新时间',
+
+    primary key(text_id)
+)
+
+
+
+消息表
+create table tb_message(
+    message_id bigint unsigned not null comment '消息id(主键)',
+    text_id bigint unsigned not null comment '消息内容id',
+    send_id bigint unsigned not null comment '消息发送人id',
+    rec_id bigint unsigned not null comment '消息接收人id',
+    create_by    bigint unsigned not null  comment '创建人',
+    create_time  datetime not null comment '创建时间',
+    update_by    bigint unsigned  comment '更新人',
+    update_time  datetime comment '更新时间',
+    primary key(message_id)
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

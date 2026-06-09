@@ -14,6 +14,7 @@ import com.bite.system.domain.question.es.QuestionES;
 import com.bite.system.domain.question.vo.QuestionDetailVO;
 import com.bite.system.domain.question.vo.QuestionVO;
 import com.bite.system.elasticsearch.QuestionRepository;
+import com.bite.system.manager.QuestionCacheManager;
 import com.bite.system.mapper.question.QuestionMapper;
 import com.bite.system.service.question.IQuestionService;
 import com.github.pagehelper.PageHelper;
@@ -34,6 +35,8 @@ public class QuestionServiceImpl implements IQuestionService {
     @Autowired
     private QuestionRepository questionRepository;
 
+    @Autowired
+    private QuestionCacheManager questionCacheManager;
     @Override
     public List<QuestionVO> list(QuestionQueryDTO questionQueryDTO) {
         String excludeIdStr = questionQueryDTO.getExcludeIdStr();
@@ -64,6 +67,7 @@ public class QuestionServiceImpl implements IQuestionService {
         QuestionES questionES = new QuestionES();
         BeanUtil.copyProperties(question,questionES);
         questionRepository.save(questionES);
+        questionCacheManager.addCache(questionES.getQuestionId());
         return true;
     }
 
@@ -108,6 +112,7 @@ public class QuestionServiceImpl implements IQuestionService {
             throw new ServiceException(ResultCode.FAILED_NOT_EXISTS);
         }
         questionRepository.deleteById(questionId);
+        questionCacheManager.deleteCache(questionId);
         return questionMapper.deleteById(questionId);
     }
 }

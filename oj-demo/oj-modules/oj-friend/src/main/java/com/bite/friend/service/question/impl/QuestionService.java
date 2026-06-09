@@ -7,8 +7,10 @@ import com.bite.common.core.domain.TableDataInfo;
 import com.bite.friend.domain.question.Question;
 import com.bite.friend.domain.question.dto.QuestionQueryDTO;
 import com.bite.friend.domain.question.es.QuestionES;
+import com.bite.friend.domain.question.vo.QuestionDetailVO;
 import com.bite.friend.domain.question.vo.QuestionVO;
 import com.bite.friend.elasticsearch.QuestionRepository;
+import com.bite.friend.manager.QuestionCacheManager;
 import com.bite.friend.mapper.question.QuestionMapper;
 import com.bite.friend.service.question.IQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ public class QuestionService implements IQuestionService {
     @Autowired
     private QuestionMapper questionMapper;
 
+    @Autowired
+    private QuestionCacheManager questionCacheManager;
     @Override
     public TableDataInfo list(QuestionQueryDTO questionQueryDTO) {
         long count = questionRepository.count();
@@ -57,6 +61,41 @@ public class QuestionService implements IQuestionService {
         List<QuestionES> questionESList = questionESPage.getContent();
         List<QuestionVO> questionVOList = BeanUtil.copyToList(questionESList, QuestionVO.class);
         return TableDataInfo.success(questionVOList,total);
+    }
+
+    @Override
+    public QuestionDetailVO detail(Long questionId) {
+        QuestionES questionES = questionRepository.findById(questionId).orElse(null);
+        QuestionDetailVO questionDetailVO = new QuestionDetailVO();
+        if (questionES != null){
+            BeanUtil.copyProperties(questionES,questionDetailVO);
+            return questionDetailVO;
+        }
+        Question question = questionMapper.selectById(questionId);
+        if (question == null){
+            return null;
+        }
+        refreshQuestion();
+        BeanUtil.copyProperties(question,questionDetailVO);
+        return questionDetailVO;
+    }
+
+    @Override
+    public String preQuestion(Long questionId) {
+        Long listSize = questionCacheManager.getListSize();
+        if (listSize == null || listSize <= 0){
+            questionCacheManager.refreshCache();
+        }
+        return questionCacheManager.preQuestion(questionId).toString();
+    }
+
+    @Override
+    public String nextQuestion(Long questionId) {
+        Long listSize = questionCacheManager.getListSize();
+        if (listSize == null || listSize <= 0){
+            questionCacheManager.refreshCache();
+        }
+        return questionCacheManager.nextQuestion(questionId).toString();
     }
 
     private void refreshQuestion() {

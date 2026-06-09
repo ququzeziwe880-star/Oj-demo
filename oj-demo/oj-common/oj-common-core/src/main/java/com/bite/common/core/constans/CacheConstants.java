@@ -20,4 +20,14 @@ public class CacheConstants {
     public static final long USER_EXP = 10;
 
     public static final String USER_UPLOAD_TIMES_KEY = "u:u:t";
+
+    public static final String QUESTION_LIST = "q:l";
+
+    public static final String EXAM_QUESTION_LIST = "e:q:l:";
+
+    public static final String USER_MESSAGE_LIST = "u:m:l:";
+
+    public static final String MESSAGE_DETAIL = "m:d:";
+
+    public static final String EXAM_RANK_LIST = "e:r:l:";
 }
